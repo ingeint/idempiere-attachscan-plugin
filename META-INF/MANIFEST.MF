@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: AttachmentScanner
+Bundle-SymbolicName: ve.net.dcs.AttachmentScanner;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Double Click Sistemas C.A.
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.adempiere.base;bundle-version="1.0.0",
+ org.adempiere.plugin.utils;bundle-version="0.0.0",
+ org.zkoss.zk.library;bundle-version="6.0.0",
+ org.adempiere.ui;bundle-version="1.0.0",
+ org.adempiere.ui.zk;bundle-version="1.0.0"
+Bundle-ClassPath: lib/guava-15.0.jar,
+ lib/jfreesane-0.8.jar,
+ .
+Service-Component: OSGI-INF/ve.net.dcs.AttachmentScannerAction.xml
+Bundle-Activator: org.adempiere.plugin.utils.AdempiereActivator
+Export-Package: action.images
