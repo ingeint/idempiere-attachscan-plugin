@@ -189,8 +189,7 @@ public class WAttachmentScanner extends Window implements EventListener<Event> {
 		loadAttachments();
 
 		try {
-			setAttribute(Window.MODE_KEY, Window.MODE_HIGHLIGHTED);
-			AEnv.showWindow(this);
+			
 			if (autoPreview(0, true)) {
 				String script = "setTimeout(\"zk.Widget.$('" + preview.getUuid() + "').$n().src = zk.Widget.$('" + preview.getUuid() + "').$n().src\", 1000)";
 				Clients.response(new AuScript(null, script));
@@ -481,11 +480,9 @@ public class WAttachmentScanner extends Window implements EventListener<Event> {
 
 			if (newText.length() > 0 || m_attachment.getEntryCount() > 0) {
 				if (m_change) {
-					m_attachment.setBinaryData(new byte[0]); // ATTENTION! HEAVY
-																// HACK HERE...
-																// Else it will
-																// not save :(
-					m_attachment.setTextMsg(text.getText());
+					m_attachment.setBinaryData(new byte[0]); 
+					m_attachment.setTitle(" ");
+					m_attachment.setTextMsg(text.getText());					
 					m_attachment.saveEx();
 				}
 			} else {
