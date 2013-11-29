@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: AttachmentScanner
+Bundle-Name: Attachment From Scanner
 Bundle-SymbolicName: ve.net.dcs.AttachmentScanner;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.0.Bqualifier
 Bundle-Vendor: Double Click Sistemas C.A.
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
