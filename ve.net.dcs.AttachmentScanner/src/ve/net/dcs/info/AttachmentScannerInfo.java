@@ -6,5 +6,5 @@ public class AttachmentScannerInfo {
 	public static final String name = "Attachment From Scanner";
 	public static final String vendor = "Double Click Sistemas C.A.";
 	public static final String web = "http://dcs.net.ve";
-	public static final String version = "1.2.0.B";
+	public static final String version = "1.2.1.B";
 }
