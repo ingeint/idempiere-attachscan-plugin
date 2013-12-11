@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?><idempiere Name="ve.net.dcs.AttachmentScanner" Version="1" idempiereVersion="" DataBaseVersion="" Description="" Author="" AuthorEmail="" CreatedDate="2013-11-29 10:31:14.044" UpdatedDate="2013-11-29 10:31:14.044" PackOutVersion="100" Client="0-SYSTEM-System" AD_Client_UU="11237b53-9592-4af1-b3c5-afd216514b5d">
+    <AD_EntityType type="table">
+        <AD_Client_ID>0</AD_Client_ID>
+        <AD_Org_ID>0</AD_Org_ID>
+        <Processing>false</Processing>
+        <ModelPackage>ve.net.dcs.model</ModelPackage>
+        <Version>1.0</Version>
+        <Help/>
+        <EntityType>ve.net.dcs</EntityType>
+        <Classpath/>
+        <AD_EntityType_UU>6e7fd696-1e6b-4dc6-b5cb-bf3027dc39ff</AD_EntityType_UU>
+        <Description/>
+        <IsActive>true</IsActive>
+        <Name>Double Click Sistemas C.A.</Name>
+    </AD_EntityType>
+    <AD_ToolBarButton type="table">
+        <AD_Client_ID>0</AD_Client_ID>
+        <AD_Org_ID>0</AD_Org_ID>
+        <Action>W</Action>
+        <AD_Tab_ID reference="id"/>
+        <AD_Process_ID reference="id"/>
+        <DisplayLogic/>
+        <SeqNo/>
+        <ActionClassName>ve.net.dcs.AttachmentScannerAction</ActionClassName>
+        <AD_ToolBarButton_UU>796b29a0-18a8-41ae-9005-0afa53c3bb7e</AD_ToolBarButton_UU>
+        <KeyStroke_Modifiers>0</KeyStroke_Modifiers>
+        <IsCustomization>true</IsCustomization>
+        <Name>Window - Attachment Scanner</Name>
+        <ComponentName>AttachmentScannerAction</ComponentName>
+        <ActionName/>
+        <KeyStroke_KeyCode>0</KeyStroke_KeyCode>
+        <IsActive>true</IsActive>
+    </AD_ToolBarButton>
+    <AD_Message type="table">
+        <AD_Client_ID>0</AD_Client_ID>
+        <AD_Org_ID>0</AD_Org_ID>
+        <MsgType>I</MsgType>
+        <MsgText>Attach from scanner</MsgText>
+        <MsgTip/>
+        <EntityType>ve.net.dcs</EntityType>
+        <AD_Message_UU>15c955ab-0af8-4d13-a4b5-88ceac0a4a7b</AD_Message_UU>
+        <Value>ve.net.dcs.AttachmentScannerAction.tooltip</Value>
+        <IsActive>true</IsActive>
+        <AD_Message_Trl type="translation">
+            <MsgText>Adjuntar desde escaner</MsgText>
+            <MsgTip/>
+            <AD_Language>es_VE</AD_Language>
+            <IsActive>true</IsActive>
+            <IsTranslated>false</IsTranslated>
+        </AD_Message_Trl>
+        <AD_Message_Trl type="translation">
+            <MsgText>Adjuntar desde escaner</MsgText>
+            <MsgTip/>
+            <AD_Language>es_CO</AD_Language>
+            <IsActive>true</IsActive>
+            <IsTranslated>false</IsTranslated>
+        </AD_Message_Trl>
+    </AD_Message>
+    <AD_Message type="table">
+        <AD_Client_ID>0</AD_Client_ID>
+        <AD_Org_ID>0</AD_Org_ID>
+        <MsgType>I</MsgType>
+        <MsgText>Select Scanner</MsgText>
+        <MsgTip/>
+        <EntityType>ve.net.dcs</EntityType>
+        <AD_Message_UU>d575e18a-33c2-461b-9624-3a9e433038f3</AD_Message_UU>
+        <Value>SelectScanner</Value>
+        <IsActive>true</IsActive>
+        <AD_Message_Trl type="translation">
+            <MsgText>Seleccionar escaner</MsgText>
+            <MsgTip/>
+            <AD_Language>es_VE</AD_Language>
+            <IsActive>true</IsActive>
+            <IsTranslated>false</IsTranslated>
+        </AD_Message_Trl>
+        <AD_Message_Trl type="translation">
+            <MsgText>Seleccionar escaner</MsgText>
+            <MsgTip/>
+            <AD_Language>es_CO</AD_Language>
+            <IsActive>true</IsActive>
+            <IsTranslated>false</IsTranslated>
+        </AD_Message_Trl>
+    </AD_Message>
+    <AD_Message type="table">
+        <AD_Client_ID>0</AD_Client_ID>
+        <AD_Org_ID>0</AD_Org_ID>
+        <MsgType>I</MsgType>
+        <MsgText>IP settings of the scanners can not found</MsgText>
+        <MsgTip/>
+        <EntityType>U</EntityType>
+        <AD_Message_UU>0ccd348f-8c0f-435c-bcf8-9e5a09ed5291</AD_Message_UU>
+        <Value>NO_IP_SCANNER_CONFIG</Value>
+        <IsActive>true</IsActive>
+        <AD_Message_Trl type="translation">
+            <MsgText>No se encontro la configuración ip de los escaneres</MsgText>
+            <MsgTip/>
+            <AD_Language>es_VE</AD_Language>
+            <IsActive>true</IsActive>
+            <IsTranslated>false</IsTranslated>
+        </AD_Message_Trl>
+        <AD_Message_Trl type="translation">
+            <MsgText>No se encontro la configuración ip de los escaneres</MsgText>
+            <MsgTip/>
+            <AD_Language>es_CO</AD_Language>
+            <IsActive>true</IsActive>
+            <IsTranslated>false</IsTranslated>
+        </AD_Message_Trl>
+    </AD_Message>
+    <AD_Message type="table">
+        <AD_Client_ID>0</AD_Client_ID>
+        <AD_Org_ID>0</AD_Org_ID>
+        <MsgType>I</MsgType>
+        <MsgText>Scanners not found</MsgText>
+        <MsgTip/>
+        <EntityType>ve.net.dcs</EntityType>
+        <AD_Message_UU>17f58beb-5cf4-473d-a6e8-0880dd2fc987</AD_Message_UU>
+        <Value>NO_FOUND_SCANNER</Value>
+        <IsActive>true</IsActive>
+        <AD_Message_Trl type="translation">
+            <MsgText>Escaneres no encontrados</MsgText>
+            <MsgTip/>
+            <AD_Language>es_VE</AD_Language>
+            <IsActive>true</IsActive>
+            <IsTranslated>false</IsTranslated>
+        </AD_Message_Trl>
+        <AD_Message_Trl type="translation">
+            <MsgText>Escaneres no encontrados</MsgText>
+            <MsgTip/>
+            <AD_Language>es_CO</AD_Language>
+            <IsActive>true</IsActive>
+            <IsTranslated>false</IsTranslated>
+        </AD_Message_Trl>
+    </AD_Message>
+    <AD_Message type="table">
+        <AD_Client_ID>0</AD_Client_ID>
+        <AD_Org_ID>0</AD_Org_ID>
+        <MsgType>I</MsgType>
+        <MsgText>Configuration ip scanners empty</MsgText>
+        <MsgTip/>
+        <EntityType>ve.net.dcs</EntityType>
+        <AD_Message_UU>033ea6ed-2fa3-420a-bc0f-5fd16a763925</AD_Message_UU>
+        <Value>IP_SCANNER_CONFIG_EMPTY</Value>
+        <IsActive>true</IsActive>
+        <AD_Message_Trl type="translation">
+            <MsgText>Configuración ip de escaneres vacía</MsgText>
+            <MsgTip/>
+            <AD_Language>es_VE</AD_Language>
+            <IsActive>true</IsActive>
+            <IsTranslated>false</IsTranslated>
+        </AD_Message_Trl>
+        <AD_Message_Trl type="translation">
+            <MsgText>Configuración ip de escaneres vacía</MsgText>
+            <MsgTip/>
+            <AD_Language>es_CO</AD_Language>
+            <IsActive>true</IsActive>
+            <IsTranslated>false</IsTranslated>
+        </AD_Message_Trl>
+    </AD_Message>
+    <AD_Message type="table">
+        <AD_Client_ID>0</AD_Client_ID>
+        <AD_Org_ID>0</AD_Org_ID>
+        <MsgType>I</MsgType>
+        <MsgText>Error getting image from scanner</MsgText>
+        <MsgTip/>
+        <EntityType>ve.net.dcs</EntityType>
+        <AD_Message_UU>b1593af3-aff9-478b-bae3-5b1117d0ed1a</AD_Message_UU>
+        <Value>ERROR_GET_SCANNER_IMAGE</Value>
+        <IsActive>true</IsActive>
+        <AD_Message_Trl type="translation">
+            <MsgText>Error obteniendo imagen desde escaner</MsgText>
+            <MsgTip/>
+            <AD_Language>es_VE</AD_Language>
+            <IsActive>true</IsActive>
+            <IsTranslated>false</IsTranslated>
+        </AD_Message_Trl>
+        <AD_Message_Trl type="translation">
+            <MsgText>Error obteniendo imagen desde escaner</MsgText>
+            <MsgTip/>
+            <AD_Language>es_CO</AD_Language>
+            <IsActive>true</IsActive>
+            <IsTranslated>false</IsTranslated>
+        </AD_Message_Trl>
+    </AD_Message>
+    <AD_Message type="table">
+        <AD_Client_ID>0</AD_Client_ID>
+        <AD_Org_ID>0</AD_Org_ID>
+        <MsgType>I</MsgType>
+        <MsgText>Scan</MsgText>
+        <MsgTip/>
+        <EntityType>ve.net.dcs</EntityType>
+        <AD_Message_UU>7b2adf2c-c1b4-4b59-b4ac-f3bdad9efa77</AD_Message_UU>
+        <Value>ve.net.dcs.AttachmentScannerAction.label</Value>
+        <IsActive>true</IsActive>
+        <AD_Message_Trl type="translation">
+            <MsgText>Scan</MsgText>
+            <MsgTip/>
+            <AD_Language>es_VE</AD_Language>
+            <IsActive>true</IsActive>
+            <IsTranslated>false</IsTranslated>
+        </AD_Message_Trl>
+        <AD_Message_Trl type="translation">
+            <MsgText>Scan</MsgText>
+            <MsgTip/>
+            <AD_Language>es_CO</AD_Language>
+            <IsActive>true</IsActive>
+            <IsTranslated>false</IsTranslated>
+        </AD_Message_Trl>
+    </AD_Message>
+    <AD_SysConfig type="table">
+        <AD_Client_ID>0</AD_Client_ID>
+        <AD_Org_ID>0</AD_Org_ID>
+        <ConfigurationLevel>O</ConfigurationLevel>
+        <Value>127.0.0.1:6566</Value>
+        <Description>IP address of network scanners. Separate addresses with a ";"</Description>
+        <AD_SysConfig_UU>1e0e0f10-9fce-401e-8233-75f3680a7ce9</AD_SysConfig_UU>
+        <IsActive>true</IsActive>
+        <Name>IP_SCANNERS</Name>
+        <EntityType>ve.net.dcs</EntityType>
+    </AD_SysConfig>
+    <AD_SysConfig type="table">
+        <AD_Client_ID>0</AD_Client_ID>
+        <AD_Org_ID>0</AD_Org_ID>
+        <ConfigurationLevel>O</ConfigurationLevel>
+        <Value>jpg</Value>
+        <Description>Extension of scanning image obtained</Description>
+        <AD_SysConfig_UU>bae9b30c-028c-4e3c-ad87-3da4738b6812</AD_SysConfig_UU>
+        <IsActive>true</IsActive>
+        <Name>EXTENSION_SCANNER_IMAGE</Name>
+        <EntityType>ve.net.dcs</EntityType>
+    </AD_SysConfig>
+</idempiere>
