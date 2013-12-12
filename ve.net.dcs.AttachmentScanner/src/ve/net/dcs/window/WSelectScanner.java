@@ -142,6 +142,10 @@ public class WSelectScanner extends Window implements EventListener<Event> {
 
 		SaneDevice device = cbContent.getSelectedItem().getValue();
 		String extension = MSysConfig.getValue("EXTENSION_SCANNER_IMAGE", "jpg", Env.getAD_Client_ID(Env.getCtx()), Env.getAD_Org_ID(Env.getCtx()));
+
+		if (!extension.equals("jpg") && !extension.equals("png"))
+			extension = "jpg";
+
 		byte[] image = null;
 
 		try {
