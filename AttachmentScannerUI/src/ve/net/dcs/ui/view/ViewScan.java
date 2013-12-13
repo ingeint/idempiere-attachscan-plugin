@@ -65,6 +65,7 @@ public class ViewScan extends JFrame {
 	private JMenu mnuLocale;
 	private JMenuItem mniClose;
 	private JMenuItem mniAbout;
+	private JMenuItem mniDocumentation;
 	private JPanel noPanel;
 	private JLabel lblLogo;
 	private JLabel lblHost;
@@ -105,10 +106,13 @@ public class ViewScan extends JFrame {
 		mnuOptions.add(mnuLocale);
 		mnuOptions.add(mniClose);
 
+		mniDocumentation = new JMenuItem();
 		mniAbout = new JMenuItem();
+		mnuHelp.add(mniDocumentation);
 		mnuHelp.add(mniAbout);
 
 		menuItems.add(mniSave);
+		menuItems.add(mniDocumentation);
 		menuItems.add(mniAbout);
 		menuItems.add(mniClose);
 
@@ -236,6 +240,10 @@ public class ViewScan extends JFrame {
 
 	public JIntegerField getTxtPort() {
 		return txtPort;
+	}
+
+	public JMenuItem getMniDocumentation() {
+		return mniDocumentation;
 	}
 
 }

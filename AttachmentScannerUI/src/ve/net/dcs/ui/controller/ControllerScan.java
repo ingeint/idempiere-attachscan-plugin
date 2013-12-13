@@ -24,6 +24,7 @@
 
 package ve.net.dcs.ui.controller;
 
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -32,6 +33,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -76,8 +79,8 @@ public class ControllerScan implements ActionListener, WindowListener {
 	}
 
 	public void initView() {
-		viewScan.getTxtHost().setText("127.0.0.1");
-		viewScan.getTxtPort().setText("6566");
+		viewScan.getTxtHost().setText(SCUIFeature.get("DEFAULT_HOST"));
+		viewScan.getTxtPort().setText(SCUIFeature.get("DEFAULT_PORT"));
 		for (String string : SCUILocale.list()) {
 			JMenuItem item = new JMenuItem(string);
 			item.addActionListener(this);
@@ -97,6 +100,7 @@ public class ControllerScan implements ActionListener, WindowListener {
 		viewScan.getLblDevice().setText(SCUILocale.get("ViewScan.lblDevice"));
 		viewScan.getBtnScan().setText(SCUILocale.get("ViewScan.btnScan"));
 		viewScan.getMniSave().setText(SCUILocale.get("ViewScan.mniSave"));
+		viewScan.getMniDocumentation().setText(SCUILocale.get("ViewScan.mniDocumentation"));
 		viewScan.getLblPort().setText(SCUILocale.get("ViewScan.lblPort"));
 	}
 
@@ -108,12 +112,24 @@ public class ControllerScan implements ActionListener, WindowListener {
 			save();
 		else if (ae.getSource().equals(viewScan.getMniAbout()))
 			about();
+		else if (ae.getSource().equals(viewScan.getMniDocumentation()))
+			goDocumentation();
 		else if (ae.getSource().equals(viewScan.getBtnSearch()))
 			search();
 		else if (ae.getSource().equals(viewScan.getBtnScan()))
 			scan();
 		else if (ae.getSource().getClass().equals(JMenuItem.class))
 			changeLocale(((JMenuItem) ae.getSource()).getText());
+
+	}
+
+	public void goDocumentation() {
+		try {
+			Desktop.getDesktop().browse(new URI(SCUIFeature.get("DOCUMENTATION")));
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(viewScan, SCUILocale.get("ViewScan.errorGoDocumentation"), "Error", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+		}
 
 	}
 

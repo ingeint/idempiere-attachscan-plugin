@@ -47,7 +47,7 @@ public class ViewAbout extends JDialog {
 	public ViewAbout() {
 		setTitle(SCUILocale.get("ViewAbout.title") + " " + SCUIFeature.get("APP_NAME"));
 		setModal(true);
-		setSize(350, 250);
+		setSize(450, 230);
 		setLocationRelativeTo(this);
 		setLayout(new BorderLayout());
 		JLabel lblLogo = new JLabel();
@@ -61,6 +61,7 @@ public class ViewAbout extends JDialog {
 		panel.add(new JLabel(String.format("%s %s", SCUIFeature.get("APP_NAME"), SCUIFeature.get("VERSION"))), "width  100%, wrap");
 		panel.add(new JLabel(SCUIFeature.get("VENDOR")), "grow, wrap");
 		panel.add(new JLabel(SCUIFeature.get("WEB")), "grow, wrap");
+		panel.add(new JLabel(SCUIFeature.get("DOCUMENTATION")), "grow, wrap");
 	}
 
 }
