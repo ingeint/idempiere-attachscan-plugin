@@ -2,10 +2,10 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Attachment From Scanner
 Bundle-SymbolicName: ve.net.dcs.AttachmentScanner;singleton:=true
-Bundle-Version: 1.2.1.Bqualifier
+Bundle-Version: 1.2.2.Bqualifier
 Bundle-Vendor: Double Click Sistemas C.A.
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7,
- JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6,
+ JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.adempiere.base;bundle-version="0.0.0",
  org.adempiere.plugin.utils;bundle-version="0.0.0",
