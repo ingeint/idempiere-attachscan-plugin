@@ -192,14 +192,14 @@
         <Value>ve.net.dcs.AttachmentScannerAction.label</Value>
         <IsActive>true</IsActive>
         <AD_Message_Trl type="translation">
-            <MsgText>Scan</MsgText>
+            <MsgText>Escanear</MsgText>
             <MsgTip/>
             <AD_Language>es_VE</AD_Language>
             <IsActive>true</IsActive>
             <IsTranslated>false</IsTranslated>
         </AD_Message_Trl>
         <AD_Message_Trl type="translation">
-            <MsgText>Scan</MsgText>
+            <MsgText>Escanear</MsgText>
             <MsgTip/>
             <AD_Language>es_CO</AD_Language>
             <IsActive>true</IsActive>
