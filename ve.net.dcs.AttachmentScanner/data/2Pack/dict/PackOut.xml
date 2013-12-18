@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><idempiere Name="ve.net.dcs.AttachmentScanner" Version="1" idempiereVersion="" DataBaseVersion="" Description="" Author="" AuthorEmail="" CreatedDate="2013-11-29 10:31:14.044" UpdatedDate="2013-11-29 10:31:14.044" PackOutVersion="100" Client="0-SYSTEM-System" AD_Client_UU="11237b53-9592-4af1-b3c5-afd216514b5d">
+<?xml version="1.0" encoding="UTF-8"?>
+<idempiere Name="ve.net.dcs.AttachmentScanner" Version="1" idempiereVersion="" DataBaseVersion="" Description="" Author="" AuthorEmail="" CreatedDate="2013-11-29 10:31:14.044" UpdatedDate="2013-11-29 10:31:14.044" PackOutVersion="100" Client="0-SYSTEM-System" AD_Client_UU="11237b53-9592-4af1-b3c5-afd216514b5d">
     <AD_EntityType type="table">
         <AD_Client_ID>0</AD_Client_ID>
         <AD_Org_ID>0</AD_Org_ID>
@@ -226,6 +227,17 @@
         <AD_SysConfig_UU>bae9b30c-028c-4e3c-ad87-3da4738b6812</AD_SysConfig_UU>
         <IsActive>true</IsActive>
         <Name>EXTENSION_SCANNER_IMAGE</Name>
+        <EntityType>ve.net.dcs</EntityType>
+    </AD_SysConfig>
+    <AD_SysConfig type="table">
+        <AD_Client_ID>0</AD_Client_ID>
+        <AD_Org_ID>0</AD_Org_ID>
+        <ConfigurationLevel>O</ConfigurationLevel>
+        <Value>75</Value>
+        <Description>Resolution of scanning image obtained</Description>
+        <AD_SysConfig_UU>aedcfeb5-b21e-4191-92ae-cb30b04d4e4d</AD_SysConfig_UU>
+        <IsActive>true</IsActive>
+        <Name>RESOLUTION_SCANNER_IMAGE</Name>
         <EntityType>ve.net.dcs</EntityType>
     </AD_SysConfig>
 </idempiere>

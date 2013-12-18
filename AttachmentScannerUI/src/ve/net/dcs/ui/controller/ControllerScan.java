@@ -34,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -141,18 +140,21 @@ public class ControllerScan implements ActionListener, WindowListener {
 				SaneDevice device = null;
 				try {
 					device = ((SaneDeviceWrap) viewScan.getCmbDevice().getSelectedItem()).getDevice();
+					device = device.getSession().getDevice(device.getName());
 					device.open();
 					image = device.acquireImage();
 					viewScan.getLblImage().setIcon(new ImageIcon(image));
 				} catch (Exception e) {
+					e.printStackTrace();
 					JOptionPane.showMessageDialog(viewScan, SCUILocale.get("ViewScan.errorDisplayImage"), "Error", JOptionPane.ERROR_MESSAGE);
 				} finally {
 					viewWait.close();
 					try {
 						if (device != null)
 							if (device.isOpen())
-								device.close();
+								device.cancel();
 					} catch (Exception e) {
+						e.printStackTrace();
 						JOptionPane.showMessageDialog(viewScan, SCUILocale.get("ViewScan.unexpectedError"), "Error", JOptionPane.ERROR_MESSAGE);
 					}
 				}

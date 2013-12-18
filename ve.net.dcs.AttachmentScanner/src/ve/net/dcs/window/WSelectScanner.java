@@ -140,16 +140,19 @@ public class WSelectScanner extends Window implements EventListener<Event> {
 		if (cbContent.getItems().size() == 0)
 			return;
 
-		SaneDevice device = cbContent.getSelectedItem().getValue();
 		String extension = MSysConfig.getValue("EXTENSION_SCANNER_IMAGE", "jpg", Env.getAD_Client_ID(Env.getCtx()), Env.getAD_Org_ID(Env.getCtx()));
-
 		if (!extension.equals("jpg") && !extension.equals("png"))
 			extension = "jpg";
 
+		int resolution = Integer.parseInt(MSysConfig.getValue("RESOLUTION_SCANNER_IMAGE", "75", Env.getAD_Client_ID(Env.getCtx()), Env.getAD_Org_ID(Env.getCtx())));
+
+		SaneDevice device = cbContent.getSelectedItem().getValue();
 		byte[] image = null;
 
 		try {
+			device = device.getSession().getDevice(device.getName());
 			device.open();
+			device.getOption("resolution").setIntegerValue(resolution);
 			BufferedImage fi = device.acquireImage();
 			image = HelperImage.bufferedImageToByteArray(fi, extension);
 			wAttachmentScanner.loadImageFromScanner(image, String.format("%s.%s", new Timestamp(System.currentTimeMillis()), extension));
@@ -160,7 +163,7 @@ public class WSelectScanner extends Window implements EventListener<Event> {
 		} finally {
 			try {
 				if (device.isOpen())
-					device.close();
+					device.close();// OR device.cancel();
 			} catch (IOException e) {
 				log.log(Level.SEVERE, "Error closing scanner", e);
 			}
