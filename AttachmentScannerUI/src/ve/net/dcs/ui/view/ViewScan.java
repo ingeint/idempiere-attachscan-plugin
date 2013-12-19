@@ -79,6 +79,8 @@ public class ViewScan extends JFrame {
 	private JLabel lblImage;
 	private JLabel lblPort;
 	private JIntegerField txtPort;
+	private JLabel lblResolution;
+	private JIntegerField txtResolution;
 
 	public ViewScan() {
 		setSize(600, 600);
@@ -135,11 +137,13 @@ public class ViewScan extends JFrame {
 		cmbDevice.setModel(cmbDeviceModel);
 		btnScan = new JButton();
 
+		lblResolution = new JLabel();
+		txtResolution = new JIntegerField();
+
 		buttons.add(btnScan);
 		buttons.add(btnSearch);
 
 		noPanel.add(lblLogo, "span 1 3");
-		noPanel.add(new JLabel(" "), "wrap");
 		noPanel.add(lblHost, "width 60, height 26");
 		noPanel.add(txtHost, "width 200, height 26");
 		noPanel.add(lblPort, "width 40, height 26");
@@ -148,6 +152,8 @@ public class ViewScan extends JFrame {
 		noPanel.add(lblDevice, "grow, height 26");
 		noPanel.add(cmbDevice, "growx, span 3, height 26");
 		noPanel.add(btnScan, "width 60, height 26, wrap");
+		noPanel.add(lblResolution, "width 40, height 26");
+		noPanel.add(txtResolution, "width 80, height 26");
 		add(noPanel, BorderLayout.NORTH);
 
 		// CENTER PANEL
@@ -244,6 +250,14 @@ public class ViewScan extends JFrame {
 
 	public JMenuItem getMniDocumentation() {
 		return mniDocumentation;
+	}
+
+	public JLabel getLblResolution() {
+		return lblResolution;
+	}
+
+	public JIntegerField getTxtResolution() {
+		return txtResolution;
 	}
 
 }

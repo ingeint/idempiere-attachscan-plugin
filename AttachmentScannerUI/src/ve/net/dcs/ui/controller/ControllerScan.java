@@ -79,6 +79,7 @@ public class ControllerScan implements ActionListener, WindowListener {
 
 	public void initView() {
 		viewScan.getTxtHost().setText(SCUIFeature.get("DEFAULT_HOST"));
+		viewScan.getTxtResolution().setText(SCUIFeature.get("DEFAULT_RESOLUTION"));
 		viewScan.getTxtPort().setText(SCUIFeature.get("DEFAULT_PORT"));
 		for (String string : SCUILocale.list()) {
 			JMenuItem item = new JMenuItem(string);
@@ -101,6 +102,7 @@ public class ControllerScan implements ActionListener, WindowListener {
 		viewScan.getMniSave().setText(SCUILocale.get("ViewScan.mniSave"));
 		viewScan.getMniDocumentation().setText(SCUILocale.get("ViewScan.mniDocumentation"));
 		viewScan.getLblPort().setText(SCUILocale.get("ViewScan.lblPort"));
+		viewScan.getLblResolution().setText(SCUILocale.get("ViewScan.lblResolution"));
 	}
 
 	@Override
@@ -140,8 +142,9 @@ public class ControllerScan implements ActionListener, WindowListener {
 				SaneDevice device = null;
 				try {
 					device = ((SaneDeviceWrap) viewScan.getCmbDevice().getSelectedItem()).getDevice();
-					device = device.getSession().getDevice(device.getName());
+					device = device.getSession().getDevice(device.getName());					
 					device.open();
+					device.getOption("resolution").setIntegerValue(viewScan.getTxtResolution().getInteger());
 					image = device.acquireImage();
 					viewScan.getLblImage().setIcon(new ImageIcon(image));
 				} catch (Exception e) {
