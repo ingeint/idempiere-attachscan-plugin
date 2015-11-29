@@ -10,7 +10,7 @@ directly from iDempiere.
 Features
 --------
 - Copyright: 2015 INGEINT (http://www.ingeint.com)
-- Repository: https://bitbucket.org/ingeint/scaleconnector_idempiere
+- Repository: https://bitbucket.org/ingeint/attachscan_idempiere
 - License: GPL 2
 - Language: Java
 - IDE: Eclipse
@@ -20,7 +20,7 @@ Features
 
 Documentation
 -------------
-- http://wiki.idempiere.org/en/Plugin:_Scale_Connector
+- http://wiki.idempiere.org/en/Plugin:_Attachment_Scanner
 - http://www.sane-project.org/
 - http://es.wikipedia.org/wiki/Scanner_Access_Now_Easy
 - http://wiki.idempiere.org/en/NF1.0_CustomWindowToolbarButton
