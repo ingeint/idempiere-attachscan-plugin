@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Bundle-Category: idempiere-plugin
+Bundle-ManifestVersion: 2
+Bundle-Name: Attachscan Plugin
+Bundle-SymbolicName: com.ingeint.attachscan
+Bundle-Version: 7.1.0.qualifier
+Bundle-Vendor: INGEINT <https://www.ingeint.com>
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.apache.commons.lang3,
+ org.adempiere.base,
+ org.adempiere.plugin.utils,
+ org.adempiere.ui.zk,
+ zcommon,
+ zel,
+ zhtml,
+ zk,
+ zkbind,
+ zkplus,
+ zul,
+ zweb
+Import-Package: org.osgi.service.event
+Bundle-ClassPath: .,
+ lib/jfreesane.jar,
+ lib/guava.jar
+Service-Component: OSGI-INF/com.ingeint.action.AttachScan.xml
+Bundle-Activator: org.adempiere.plugin.utils.Incremental2PackActivator
+Export-Package: action.images

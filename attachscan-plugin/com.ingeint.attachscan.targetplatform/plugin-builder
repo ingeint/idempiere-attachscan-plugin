@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+
+set -e
+
+DEBUG_MODE=
+
+if [ "$1" = "debug" ]; then
+    DEBUG_MODE=-X
+    shift
+fi
+
+javac TargetPlatformPomGenerator.java
+java TargetPlatformPomGenerator "$@"
+mvn validate -Didempiere.target=com.ingeint.attachscan.p2.targetplatform $DEBUG_MODE
+mvn verify -Didempiere.target=com.ingeint.attachscan.p2.targetplatform $DEBUG_MODE
+javac TargetPlatformPluginTagger.java
+java TargetPlatformPluginTagger "$@"
