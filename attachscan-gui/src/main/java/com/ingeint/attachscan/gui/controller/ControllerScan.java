@@ -127,29 +127,28 @@ public class ControllerScan implements ActionListener, WindowListener {
 
     public void scan() {
         viewWait = new ViewWait();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SaneDevice device = null;
-                try {
-                    device = ((SaneDeviceWrap) viewScan.getCmbDevice().getSelectedItem()).getDevice();
+        new Thread(() -> {
+            SaneDevice device = null;
+            try {
+                device = ((SaneDeviceWrap) viewScan.getCmbDevice().getSelectedItem()).getDevice();
+                if (!device.isOpen()) {
                     device.open();
-                    device.getOption("resolution").setIntegerValue(viewScan.getTxtResolution().getInteger());
-                    image = device.acquireImage();
-                    viewScan.getLblImage().setIcon(new ImageIcon(image));
+                }
+                device.getOption("resolution").setIntegerValue(viewScan.getTxtResolution().getInteger());
+                image = device.acquireImage();
+                viewScan.getLblImage().setIcon(new ImageIcon(image));
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(viewScan, ASUILocale.get("ViewScan.errorDisplayImage"), "Error", JOptionPane.ERROR_MESSAGE);
+            } finally {
+                viewWait.close();
+                try {
+                    if (device != null && device.isOpen()) {
+                        device.close();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    JOptionPane.showMessageDialog(viewScan, ASUILocale.get("ViewScan.errorDisplayImage"), "Error", JOptionPane.ERROR_MESSAGE);
-                } finally {
-                    viewWait.close();
-                    try {
-                        if (device != null)
-                            if (device.isOpen())
-                                device.cancel();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        JOptionPane.showMessageDialog(viewScan, ASUILocale.get("ViewScan.unexpectedError"), "Error", JOptionPane.ERROR_MESSAGE);
-                    }
+                    JOptionPane.showMessageDialog(viewScan, ASUILocale.get("ViewScan.unexpectedError"), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }).start();

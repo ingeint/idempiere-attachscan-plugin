@@ -78,6 +78,7 @@ public class WSelectScanner extends Window implements EventListener<Event> {
 	private Hlayout confirmPanel = new Hlayout();
 	private Hbox toolBar = new Hbox();
 	private WAttachmentScanner wAttachmentScanner;
+	private SaneSession session;
 
 	public WSelectScanner(WAttachmentScanner wAttachmentScanner) {
 		this.wAttachmentScanner = wAttachmentScanner;
@@ -155,7 +156,9 @@ public class WSelectScanner extends Window implements EventListener<Event> {
 		byte[] image = null;
 
 		try {
-			device.open();
+			if (!device.isOpen()) {
+				device.open();
+			}
 			device.getOption("resolution").setIntegerValue(resolution);
 			BufferedImage fi = device.acquireImage();
 			image = HelperImage.bufferedImageToByteArray(fi, extension);
@@ -166,8 +169,12 @@ public class WSelectScanner extends Window implements EventListener<Event> {
 			throw new AdempiereException(Msg.getMsg(Env.getCtx(), "ERROR_GET_SCANNER_IMAGE"));
 		} finally {
 			try {
-				if (device.isOpen())
-					device.close();// OR device.cancel();
+				if (device != null && device.isOpen()) {
+					device.close();					
+				}
+				if(session!=null) {
+					session.close();
+				}
 			} catch (IOException e) {
 				log.log(Level.SEVERE, "Error closing scanner", e);
 			}
@@ -190,8 +197,8 @@ public class WSelectScanner extends Window implements EventListener<Event> {
 			try {
 				String[] ipDevice = ips[i].split(":");
 				InetAddress address = InetAddress.getByName(ipDevice[0]);
-				SaneSession session = SaneSession.withRemoteSane(address, Integer.parseInt(ipDevice[1]));
-				devices.addAll(session.listDevices());
+				session = SaneSession.withRemoteSane(address, Integer.parseInt(ipDevice[1]));
+				devices.addAll(session.listDevices());				
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Error getting scanner list", e);
 				e.printStackTrace();

@@ -35,9 +35,14 @@ Window:
 
 ![](screenshots/attachment.png)
 
+Scanner List:
+
+![](screenshots/list.png)
+
 ## Extra Links
 -------------
 - [Documentation](http://wiki.idempiere.org/en/Plugin:_Attachment_Scanner)
 - [Sane Project](http://www.sane-project.org/)
 - [Sane](http://es.wikipedia.org/wiki/Scanner_Access_Now_Easy)
 - [iDempiere Toolbar Button](http://wiki.idempiere.org/en/NF1.0_CustomWindowToolbarButton)
+- [Sane Server](https://help.ubuntu.com/community/SaneDaemonTutorial)
