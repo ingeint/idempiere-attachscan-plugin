@@ -46,3 +46,4 @@ Scanner List:
 - [Sane](http://es.wikipedia.org/wiki/Scanner_Access_Now_Easy)
 - [iDempiere Toolbar Button](http://wiki.idempiere.org/en/NF1.0_CustomWindowToolbarButton)
 - [Sane Server](https://help.ubuntu.com/community/SaneDaemonTutorial)
+- [JFreesane](https://github.com/sjamesr/jfreesane)
