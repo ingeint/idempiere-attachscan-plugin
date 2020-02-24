@@ -1,39 +1,35 @@
-/**
- * This file is part of Attach Scan.
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Copyright (C) 2015 INGEINT <http://www.ingeint.com>.
- * Copyright (C) Contributors.
- * 
- * Contributors:
- *    - 2015 Saúl Piña <spina@ingeint.com>.
- */
+/******************************************************************************
+ * Copyright (C) 2008 Low Heng Sin  All Rights Reserved.                      *
+ * This program is free software; you can redistribute it and/or modify it    *
+ * under the terms version 2 of the GNU General Public License as published   *
+ * by the Free Software Foundation. This program is distributed in the hope   *
+ * that it will be useful, but WITHOUT ANY WARRANTY; without even the implied *
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.           *
+ * See the GNU General Public License for more details.                       *
+ * You should have received a copy of the GNU General Public License along    *
+ * with this program; if not, write to the Free Software Foundation, Inc.,    *
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
+ * For the text or an alternative of this public license, you may reach us    *
+ * Posterita Ltd., 3, Draper Avenue, Quatre Bornes, Mauritius                 *
+ * or via info@posterita.org or http://www.posterita.org/                     *
+ *****************************************************************************/
 
 package com.ingeint.attachscan.window;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.util.Callback;
 import org.adempiere.webui.AdempiereWebUI;
+import org.adempiere.webui.ClientInfo;
 import org.adempiere.webui.apps.AEnv;
 import org.adempiere.webui.component.Button;
 import org.adempiere.webui.component.ConfirmPanel;
@@ -46,9 +42,11 @@ import org.adempiere.webui.component.Window;
 import org.adempiere.webui.event.DialogEvents;
 import org.adempiere.webui.factory.ButtonFactory;
 import org.adempiere.webui.theme.ThemeManager;
+import org.adempiere.webui.util.ZKUpdateUtil;
 import org.adempiere.webui.window.FDialog;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MAttachmentEntry;
+import org.compiere.model.MTable;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
@@ -57,7 +55,6 @@ import org.zkoss.image.AImage;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
 import org.zkoss.zk.au.out.AuEcho;
-import org.zkoss.zk.au.out.AuScript;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
@@ -74,24 +71,26 @@ import org.zkoss.zul.South;
 import org.zkoss.zul.Vlayout;
 
 /**
- * Based on  WAttachment
+ *
  * @author Low Heng Sin
+ *
  */
-public class WAttachmentScanner extends Window implements EventListener<Event> {
+public class WAttachmentScanner extends Window implements EventListener<Event>
+{
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 4311076973993361653L;
+	private static final long serialVersionUID = 8266807399792500541L;
 
-	private static CLogger log = CLogger.getCLogger(WAttachmentScanner.class);
+	private static final CLogger log = CLogger.getCLogger(WAttachmentScanner.class);
 
-	/** Window No */
-	private int m_WindowNo;
+	/**	Window No				*/
+	private int	m_WindowNo;
 
-	/** Attachment */
+	/** Attachment				*/
 	private MAttachment m_attachment = null;
 
-	/** Change */
+	/** Change					*/
 	private boolean m_change = false;
 
 	private Iframe preview = new Iframe();
@@ -104,10 +103,9 @@ public class WAttachmentScanner extends Window implements EventListener<Event> {
 
 	private Button bDelete = ButtonFactory.createNamedButton(ConfirmPanel.A_DELETE, false, true);
 	private Button bSave = new Button();
+	private Button bSaveAllAsZip = new Button();
 	private Button bDeleteAll = new Button();
-
 	private Button bLoad = new Button();
-	private Button bScan = new Button();
 	private Button bCancel = ButtonFactory.createNamedButton(ConfirmPanel.A_CANCEL, false, true);
 	private Button bOk = ButtonFactory.createNamedButton(ConfirmPanel.A_OK, false, true);
 	private Button bRefresh = ButtonFactory.createNamedButton(ConfirmPanel.A_REFRESH, false, true);
@@ -122,7 +120,11 @@ public class WAttachmentScanner extends Window implements EventListener<Event> {
 
 	private int displayIndex;
 
+	private String orientation;
+
 	private static List<String> autoPreviewList;
+
+	private Button bScan = new Button();
 
 	static {
 		autoPreviewList = new ArrayList<String>();
@@ -131,106 +133,131 @@ public class WAttachmentScanner extends Window implements EventListener<Event> {
 		autoPreviewList.add("image/gif");
 		autoPreviewList.add("text/plain");
 		autoPreviewList.add("application/pdf");
+		// autoPreviewList.add("text/html"); IDEMPIERE-3980
 	}
 
 	/**
-	 * Constructor. loads Attachment, if ID <> 0
-	 * 
-	 * @param WindowNo
-	 *            window no
-	 * @param AD_Attachment_ID
-	 *            attachment
-	 * @param AD_Table_ID
-	 *            table
-	 * @param Record_ID
-	 *            record key
-	 * @param trxName
-	 *            transaction
+	 *	Constructor.
+	 *	loads Attachment, if ID <> 0
+	 *  @param WindowNo window no
+	 *  @param AD_Attachment_ID attachment
+	 *  @param AD_Table_ID table
+	 *  @param Record_ID record key
+	 *  @param trxName transaction
 	 */
 
-	public WAttachmentScanner(int WindowNo, int AD_Attachment_ID, int AD_Table_ID, int Record_ID, String trxName) {
-		this(WindowNo, AD_Attachment_ID, AD_Table_ID, Record_ID, trxName, (EventListener<Event>) null);
+	public WAttachmentScanner(	int WindowNo, int AD_Attachment_ID,
+						int AD_Table_ID, int Record_ID, String trxName)
+	{
+		this(WindowNo, AD_Attachment_ID, AD_Table_ID, Record_ID, trxName, (EventListener<Event>)null);
 	}
-
+	
 	/**
-	 * Constructor. loads Attachment, if ID <> 0
-	 * 
-	 * @param WindowNo
-	 *            window no
-	 * @param AD_Attachment_ID
-	 *            attachment
-	 * @param AD_Table_ID
-	 *            table
-	 * @param Record_ID
-	 *            record key
-	 * @param trxName
-	 *            transaction
+	 *	Constructor.
+	 *	loads Attachment, if ID <> 0
+	 *  @param WindowNo window no
+	 *  @param AD_Attachment_ID attachment
+	 *  @param AD_Table_ID table
+	 *  @param Record_ID record key
+	 *  @param trxName transaction
 	 */
 
-	public WAttachmentScanner(int WindowNo, int AD_Attachment_ID, int AD_Table_ID, int Record_ID, String trxName, EventListener<Event> eventListener) {
+	public WAttachmentScanner(	int WindowNo, int AD_Attachment_ID,
+						int AD_Table_ID, int Record_ID, String trxName, EventListener<Event> eventListener)
+	{
+		super();
 
-		if (log.isLoggable(Level.CONFIG))
-			log.config("ID=" + AD_Attachment_ID + ", Table=" + AD_Table_ID + ", Record=" + Record_ID);
+		if (log.isLoggable(Level.CONFIG)) log.config("ID=" + AD_Attachment_ID + ", Table=" + AD_Table_ID + ", Record=" + Record_ID);
 
 		m_WindowNo = WindowNo;
-		if (eventListener != null) {
+		this.addEventListener(DialogEvents.ON_WINDOW_CLOSE, this);
+		if (eventListener != null) 
+		{
 			this.addEventListener(DialogEvents.ON_WINDOW_CLOSE, eventListener);
 		}
-
-		try {
+		
+		try
+		{
 			staticInit();
-		} catch (Exception ex) {
+		}
+		catch (Exception ex)
+		{
 			log.log(Level.SEVERE, "", ex);
 		}
 
-		// Create Model
+		//	Create Model
 
 		if (AD_Attachment_ID > 0)
-			m_attachment = new MAttachment(Env.getCtx(), AD_Attachment_ID, trxName);
+			m_attachment = new MAttachment (Env.getCtx(), AD_Attachment_ID, trxName);
 		else
-			m_attachment = new MAttachment(Env.getCtx(), AD_Table_ID, Record_ID, trxName);
+			m_attachment = new MAttachment (Env.getCtx(), AD_Table_ID, Record_ID, trxName);
 
 		loadAttachments();
 
-		try {
-			
-			if (autoPreview(0, true)) {
-				String script = "setTimeout(\"zk.Widget.$('" + preview.getUuid() + "').$n().src = zk.Widget.$('" + preview.getUuid() + "').$n().src\", 1000)";
-				Clients.response(new AuScript(null, script));
+		try
+		{
+			setAttribute(Window.MODE_KEY, Window.MODE_HIGHLIGHTED);
+			AEnv.showWindow(this);
+			if (autoPreview(0, true))
+			{
+				//String script = "setTimeout(\"zk.Widget.$('"+ preview.getUuid() + "').$n().src = zk.Widget.$('" +
+				//preview.getUuid() + "').$n().src\", 1000)";
+				//Clients.response(new AuScript(null, script));
 			}
 
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 		}
 
 	} // WAttachment
 
 	/**
-	 * Static setup.
-	 * 
-	 * <pre>
-	 * -northPanel - toolBar - title - centerPane[split] - previewPanel(left) - text(right) - confirmPanel
-	 * </pre>
-	 * 
-	 * @throws Exception
+	 *	Static setup.
+	 *  <pre>
+	 *  - northPanel
+	 *      - toolBar
+	 *      - title
+	 *  - centerPane [split]
+	 * 		- previewPanel (left)
+	 *  	- text (right)
+	 *  - confirmPanel
+	 *  </pre>
+	 *  @throws Exception
 	 */
 
-	void staticInit() throws Exception {
+	void staticInit() throws Exception
+	{
 		this.setAttribute(AdempiereWebUI.WIDGET_INSTANCE_NAME, "attachment");
 		this.setMaximizable(true);
-		this.setWidth("700px");
-		this.setHeight("85%");
+		
+//		if (!ThemeManager.isUseCSSForWindowSize())
+//		{
+//			ZKUpdateUtil.setWindowWidthX(this, 700);
+//			ZKUpdateUtil.setHeight(this, "85%");
+//		}
+//		else
+//		{
+//			addCallback(AFTER_PAGE_ATTACHED, t -> {
+//				ZKUpdateUtil.setCSSHeight(this);
+//				ZKUpdateUtil.setCSSWidth(this);
+//			});
+//		}
+		
+		ZKUpdateUtil.setWindowWidthX(this, 700);
+		ZKUpdateUtil.setHeight(this, "85%");
+		
 		this.setTitle(Msg.getMsg(Env.getCtx(), "Attachment"));
 		this.setClosable(true);
 		this.setSizable(true);
 		this.setBorder("normal");
-		this.setSclass("popup-dialog");
+		this.setSclass("popup-dialog attachment-dialog");
 		this.setShadow(true);
 		this.appendChild(mainPanel);
-		mainPanel.setHeight("100%");
-		mainPanel.setWidth("100%");
+		ZKUpdateUtil.setHeight(mainPanel, "100%");
+		ZKUpdateUtil.setWidth(mainPanel, "100%");
 
 		North northPanel = new North();
-		northPanel.setHeight("85px");
 		northPanel.setStyle("padding: 4px");
 		northPanel.setCollapsible(false);
 		northPanel.setSplittable(false);
@@ -242,62 +269,83 @@ public class WAttachmentScanner extends Window implements EventListener<Event> {
 		toolBar.setAlign("center");
 		toolBar.setPack("start");
 		toolBar.appendChild(bLoad);
-		toolBar.appendChild(bScan);
 		toolBar.appendChild(bDelete);
 		toolBar.appendChild(bSave);
+		toolBar.appendChild(bSaveAllAsZip);
+		toolBar.appendChild(bScan);
 		toolBar.appendChild(cbContent);
 		toolBar.appendChild(sizeLabel);
+		
 
 		bScan.addEventListener(Events.ON_CLICK, this);
-		bScan.setImageContent(new AImage("scanner", WAttachmentScanner.class.getResourceAsStream("/action/images/com.ingeint.action.AttachScan24.png")));
+		bScan.setImageContent(new AImage("scanner", WAttachmentScanner.class.getResourceAsStream("/action/images/com.ingeint.action.Scan24.png")));
 
 		mainPanel.appendChild(northPanel);
 		Vlayout div = new Vlayout();
 		div.appendChild(toolBar);
 		text.setRows(3);
-		text.setHflex("1");
-		text.setHeight("100%");
-
+		ZKUpdateUtil.setHflex(text, "1");
+		ZKUpdateUtil.setHeight(text, "100%");
+		
 		div.appendChild(text);
 		northPanel.appendChild(div);
 
 		bSave.setEnabled(false);
 		bSave.setSclass("img-btn");
-		bSave.setImage(ThemeManager.getThemeResource("images/Export24.png"));
+		if (ThemeManager.isUseFontIconForImage())
+			bSave.setIconSclass("z-icon-Export");
+		else
+			bSave.setImage(ThemeManager.getThemeResource("images/Export24.png"));
 		bSave.setTooltiptext(Msg.getMsg(Env.getCtx(), "AttachmentSave"));
 		bSave.addEventListener(Events.ON_CLICK, this);
 
-		bLoad.setImage(ThemeManager.getThemeResource("images/Import24.png"));
+		bSaveAllAsZip.setEnabled(false);
+		bSaveAllAsZip.setSclass("img-btn");
+		if (ThemeManager.isUseFontIconForImage())
+			bSaveAllAsZip.setIconSclass("z-icon-file-zip-o");
+		else
+			bSaveAllAsZip.setImage(ThemeManager.getThemeResource("images/SaveAsZip24.png"));
+		bSaveAllAsZip.setTooltiptext(Msg.getMsg(Env.getCtx(), "ExportZIP"));
+		bSaveAllAsZip.addEventListener(Events.ON_CLICK, this);
+
+		if (ThemeManager.isUseFontIconForImage())
+			bLoad.setIconSclass("z-icon-Import");
+		else
+			bLoad.setImage(ThemeManager.getThemeResource("images/Import24.png"));
 		bLoad.setSclass("img-btn");
-		bLoad.setAttribute("org.zkoss.zul.image.preload", Boolean.TRUE);
+		bLoad.setId("bLoad");
+//		bLoad.setAttribute("org.zkoss.zul.image.preload", Boolean.TRUE);
 		bLoad.setTooltiptext(Msg.getMsg(Env.getCtx(), "Load"));
-		bLoad.setUpload(AdempiereWebUI.getUploadSetting());
+		bLoad.setUpload("multiple=true," + AdempiereWebUI.getUploadSetting());
 		bLoad.addEventListener(Events.ON_UPLOAD, this);
 
 		bDelete.addEventListener(Events.ON_CLICK, this);
 
 		previewPanel.appendChild(preview);
-		preview.setHeight("100%");
-		preview.setWidth("100%");
-
+		ZKUpdateUtil.setVflex(preview, "1");
+		ZKUpdateUtil.setHflex(preview, "1");
+		
 		Center centerPane = new Center();
 		centerPane.setSclass("dialog-content");
-		centerPane.setAutoscroll(true);
+		//centerPane.setAutoscroll(true); // not required the preview has its own scroll bar
 		mainPanel.appendChild(centerPane);
 		centerPane.appendChild(previewPanel);
-		previewPanel.setVflex("1");
-		previewPanel.setHflex("1");
+		ZKUpdateUtil.setVflex(previewPanel, "1");
+		ZKUpdateUtil.setHflex(previewPanel, "1");
 
 		South southPane = new South();
 		southPane.setSclass("dialog-footer");
 		mainPanel.appendChild(southPane);
 		southPane.appendChild(confirmPanel);
-		southPane.setVflex("min");
+		ZKUpdateUtil.setVflex(southPane, "min");
 
 		bCancel.addEventListener(Events.ON_CLICK, this);
 		bOk.addEventListener(Events.ON_CLICK, this);
 
-		bDeleteAll.setImage(ThemeManager.getThemeResource("images/Delete24.png"));
+		if (ThemeManager.isUseFontIconForImage())
+			bDeleteAll.setIconSclass("z-icon-Delete");
+		else
+			bDeleteAll.setImage(ThemeManager.getThemeResource("images/Delete24.png"));
 		bDeleteAll.setSclass("img-btn");
 		bDeleteAll.addEventListener(Events.ON_CLICK, this);
 		bDeleteAll.setTooltiptext(Util.cleanAmp(Msg.getMsg(Env.getCtx(), "DeleteAll")));
@@ -306,81 +354,117 @@ public class WAttachmentScanner extends Window implements EventListener<Event> {
 
 		confirmPanel.appendChild(bDeleteAll);
 		confirmPanel.appendChild(bRefresh);
-		confirmPanel.setHflex("1");
+		ZKUpdateUtil.setHflex(confirmPanel, "1");
 		Hbox hbox = new Hbox();
 		hbox.setPack("end");
-		hbox.setHflex("1");
+		ZKUpdateUtil.setHflex(hbox, "1");
 		confirmPanel.appendChild(hbox);
 		hbox.appendChild(bOk);
 		hbox.appendChild(bCancel);
+		
 
 		text.setTooltiptext(Msg.getElement(Env.getCtx(), "TextMsg"));
+		
+		if (ClientInfo.isMobile())
+		{
+			orientation = ClientInfo.get().orientation;
+			ClientInfo.onClientInfo(this, this::onClientInfo);
+		}
+	}
+	
+	protected void onClientInfo()
+	{		
+		if (getPage() != null)
+		{
+			String newOrienation = ClientInfo.get().orientation;
+			if (!newOrienation.equals(orientation))
+			{
+				orientation = newOrienation;
+				ZKUpdateUtil.setCSSHeight(this);
+				ZKUpdateUtil.setCSSWidth(this);
+				invalidate();
+			}
+		}
 	}
 
 	/**
-	 * Dispose
+	 * 	Dispose
 	 */
 
-	public void dispose() {
+	public void dispose ()
+	{
 		preview = null;
 		this.detach();
 	} // dispose
 
 	/**
-	 * Load Attachments
+	 *	Load Attachments
 	 */
 
-	private void loadAttachments() {
+	private void loadAttachments()
+	{
 		log.config("");
 
-		// Set Text/Description
+		//	Set Text/Description
 
 		String sText = m_attachment.getTextMsg();
 
 		if (sText == null)
-			text.setText("");
+			text .setText("");
 		else
 			text.setText(sText);
 
-		// Set Combo
+		//	Set Combo
 
 		int size = m_attachment.getEntryCount();
 
 		for (int i = 0; i < size; i++)
 			cbContent.appendItem(m_attachment.getEntryName(i), m_attachment.getEntryName(i));
 
-		if (size > 0) {
+		if (size > 0)
+		{
 			cbContent.setSelectedIndex(0);
 		}
 
 	} // loadAttachment
 
-	private boolean autoPreview(int index, boolean immediate) {
+	private boolean autoPreview(int index, boolean immediate)
+	{
 		MAttachmentEntry entry = m_attachment.getEntry(index);
-		if (entry != null) {
+		if (entry != null)
+		{
 			String mimeType = entry.getContentType();
 			byte[] data = entry.getData();
 			String unit = " KB";
 			BigDecimal size = new BigDecimal(data != null ? data.length : 0);
 			size = size.divide(new BigDecimal("1024"));
-			if (size.compareTo(new BigDecimal("1024")) >= 0) {
+			if (size.compareTo(new BigDecimal("1024")) >= 0)
+			{
 				size = size.divide(new BigDecimal("1024"));
 				unit = " MB";
 			}
-			size = size.setScale(2, BigDecimal.ROUND_HALF_EVEN);
+			size = size.setScale(2, RoundingMode.HALF_EVEN);
 			sizeLabel.setText(size.toPlainString() + unit);
 
 			bSave.setEnabled(true);
+			bSaveAllAsZip.setEnabled(true);
 			bDelete.setEnabled(true);
 
-			if (autoPreviewList.contains(mimeType)) {
+			if (autoPreviewList.contains(mimeType))
+			{
 				displayData(index, immediate);
 				return true;
-			} else {
+			}
+			else
+			{
+				clearPreview();
 				return false;
 			}
-		} else {
+		}
+		else
+		{
 			bSave.setEnabled(false);
+			bSaveAllAsZip.setEnabled(false);
 			bDelete.setEnabled(false);
 			sizeLabel.setText("");
 			return false;
@@ -388,14 +472,13 @@ public class WAttachmentScanner extends Window implements EventListener<Event> {
 	}
 
 	/**
-	 * Display gif or jpg in gifPanel
-	 * 
-	 * @param index
-	 *            index
+	 *  Display gif or jpg in gifPanel
+	 * 	@param index index
 	 */
 
-	private void displayData(int index, boolean immediate) {
-		// Reset UI
+	private void displayData (int index, boolean immediate)
+	{
+		//	Reset UI
 		preview.setSrc(null);
 
 		displayIndex = index;
@@ -404,9 +487,10 @@ public class WAttachmentScanner extends Window implements EventListener<Event> {
 			displaySelected();
 		else
 			Clients.response(new AuEcho(this, "displaySelected", null));
-	} // displayData
+	}   //  displayData
 
-	private void clearPreview() {
+	private void clearPreview()
+	{
 		preview.setSrc(null);
 		preview.setVisible(false);
 	}
@@ -416,134 +500,123 @@ public class WAttachmentScanner extends Window implements EventListener<Event> {
 	 */
 	public void displaySelected() {
 		MAttachmentEntry entry = m_attachment.getEntry(displayIndex);
-		if (log.isLoggable(Level.CONFIG))
-			log.config("Index=" + displayIndex + " - " + entry);
-		if (entry != null && entry.getData() != null && autoPreviewList.contains(entry.getContentType())) {
-			if (log.isLoggable(Level.CONFIG))
-				log.config(entry.toStringX());
+		if (log.isLoggable(Level.CONFIG)) log.config("Index=" + displayIndex + " - " + entry);
+		if (entry != null && entry.getData() != null && autoPreviewList.contains(entry.getContentType()))
+		{
+			if (log.isLoggable(Level.CONFIG)) log.config(entry.toStringX());
 
-			try {
+			try
+			{
 				String contentType = entry.getContentType();
 				AMedia media = new AMedia(entry.getName(), null, contentType, entry.getData());
 
 				preview.setContent(media);
 				preview.setVisible(true);
 				preview.invalidate();
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				log.log(Level.SEVERE, "attachment", e);
 			}
 		}
 	}
 
 	/**
-	 * Get File Name with index
-	 * 
-	 * @param index
-	 *            index
-	 * @return file name or null
+	 * 	Get File Name with index
+	 *	@param index index
+	 *	@return file name or null
 	 */
 
-	private String getFileName(int index) {
+	private String getFileName (int index)
+	{
 		String fileName = null;
 
-		if (index >= 0 && cbContent.getItemCount() > index) {
+		if (index>=0 && cbContent.getItemCount() > index)
+		{
 			ListItem listitem = cbContent.getItemAtIndex(index);
-			fileName = (String) listitem.getValue();
+			fileName = (String)listitem.getValue();
 		}
 
 		return fileName;
-	} // getFileName
+	}	//	getFileName
 
 	/**
-	 * Action Listener
-	 * 
-	 * @param e
-	 *            event
+	 *	Action Listener
+	 *  @param e event
 	 */
 
-	public void onEvent(Event e) {
-		// Save and Close
-
+	public void onEvent(Event e)
+	{
+		//	Save and Close
 		if (e instanceof UploadEvent) {
 			preview.setVisible(false);
 			UploadEvent ue = (UploadEvent) e;
-			processUploadMedia(ue.getMedia());
-		} else if (e.getTarget() == bOk) {
-			String newText = text.getText();
-
-			if (newText == null)
-				newText = "";
-
-			String oldText = m_attachment.getTextMsg();
-
-			if (oldText == null)
-				oldText = "";
-
-			if (!m_change)
-				m_change = !newText.equals(oldText);
-
-			if (newText.length() > 0 || m_attachment.getEntryCount() > 0) {
-				if (m_change) {
-					m_attachment.setBinaryData(new byte[0]); 
-					m_attachment.setTitle(" ");
-					m_attachment.setTextMsg(text.getText());					
-					m_attachment.saveEx();
-				}
-			} else {
-				m_attachment.delete(true);
-				m_attachment = null;
+			for (Media media : ue.getMedias()) {
+				processUploadMedia(media);
 			}
+			clearPreview();
+			autoPreview (cbContent.getSelectedIndex(), false);
+		} else if (e.getTarget() == bOk || DialogEvents.ON_WINDOW_CLOSE.equals(e.getName())) {
+			if (m_attachment != null) {
+				String newText = text.getText();
+				if (newText == null)
+					newText = "";
+				String oldText = m_attachment.getTextMsg();
+				if (oldText == null)
+					oldText = "";
 
+				if (!m_change)
+					m_change = !newText.equals(oldText);
+
+				if (newText.length() > 0 || m_attachment.getEntryCount() > 0) {
+					if (m_change) {
+						m_attachment.setBinaryData(new byte[0]); // ATTENTION! HEAVY HACK HERE... Else it will not save :(
+						m_attachment.setTextMsg(text.getText());
+						m_attachment.saveEx();
+						m_change = false;
+					}
+				} else {
+					m_attachment.delete(true);
+					m_attachment = null;
+				}
+
+				dispose();
+			}
+		} else if (e.getTarget() == bCancel) {
+			//	Cancel
 			dispose();
-		}
-
-		// Cancel
-
-		else if (e.getTarget() == bCancel) {
-			dispose();
-		}
-
-		// Delete Attachment
-
-		else if (e.getTarget() == bDeleteAll) {
+		} else if (e.getTarget() == bDeleteAll) {
+			//	Delete Attachment
 			deleteAttachment();
 			dispose();
-		}
-
-		// Delete individual entry and Return
-
-		else if (e.getTarget() == bDelete)
+		} else if (e.getTarget() == bDelete) {
+			//	Delete individual entry and Return
 			deleteAttachmentEntry();
-
-		// Show Data
-
-		else if (e.getTarget() == cbContent) {
+		} else if (e.getTarget() == cbContent) {
+			//	Show Data
 			clearPreview();
-			autoPreview(cbContent.getSelectedIndex(), false);
-		}
-
-		// Open Attachment
-
-		else if (e.getTarget() == bSave)
+			autoPreview (cbContent.getSelectedIndex(), false);
+		} else if (e.getTarget() == bSave) {
+			//	Open Attachment
 			saveAttachmentToFile();
-
-		else if (e.getTarget() == bRefresh)
+		} else if (e.getTarget() == bRefresh) {
 			displayData(cbContent.getSelectedIndex(), true);
-		else if (e instanceof UploadEvent) {
-			UploadEvent ue = (UploadEvent) e;
-			processUploadMedia(ue.getMedia());
+		} else if (e.getTarget() == bSaveAllAsZip) {
+			saveAllAsZip();
+		} else if (e.getTarget() == bScan) {
+			getImageFromScanner();
 		}
 
-		else if (e.getTarget() == bScan)
-			getImageFromScanner();
-
-	} // onEvent
+	}	//	onEvent
 
 	private void processUploadMedia(Media media) {
-		if (media != null && media.getByteData().length > 0) {
-			// pdfViewer.setContent(media);
+		if (media != null && media.getByteData().length>0)
+		{
+//				pdfViewer.setContent(media);
 			;
-		} else {
+		}
+		else
+		{
 			preview.setVisible(true);
 			preview.invalidate();
 			return;
@@ -553,46 +626,45 @@ public class WAttachmentScanner extends Window implements EventListener<Event> {
 		log.config(fileName);
 		int cnt = m_attachment.getEntryCount();
 
-		// update
-		for (int i = 0; i < cnt; i++) {
-			if (m_attachment.getEntryName(i).equals(fileName)) {
+		//update
+		for (int i = 0; i < cnt; i++)
+		{
+			if (m_attachment.getEntryName(i).equals(fileName))
+			{
 				m_attachment.updateEntry(i, getMediaData(media));
 				cbContent.setSelectedIndex(i);
-				clearPreview();
-				autoPreview(cbContent.getSelectedIndex(), false);
 				m_change = true;
 				return;
 			}
 		}
 
-		// new
-		if (m_attachment.addEntry(fileName, getMediaData(media))) {
+		//new
+		if (m_attachment.addEntry(fileName, getMediaData(media)))
+		{
 			cbContent.appendItem(media.getName(), media.getName());
-			cbContent.setSelectedIndex(cbContent.getItemCount() - 1);
-			autoPreview(cbContent.getSelectedIndex(), false);
-			clearPreview();
+			cbContent.setSelectedIndex(cbContent.getItemCount()-1);
 			m_change = true;
 		}
 	}
 
-	private byte[] getMediaData(Media media) {
+	private byte[] getMediaData(Media media)  {
 		byte[] bytes = null;
-
-		try {
-
-			if (media.inMemory())
-				bytes = media.isBinary() ? media.getByteData() : media.getStringData().getBytes(getCharset(media.getContentType()));
-			else {
-				InputStream is = media.getStreamData();
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				byte[] buf = new byte[1000];
-				int byteread = 0;
-
-				while ((byteread = is.read(buf)) != -1)
-					baos.write(buf, 0, byteread);
-
-				bytes = baos.toByteArray();
-			}
+		
+		try{
+			
+	      if (media.inMemory())
+		     	bytes = media.isBinary() ? media.getByteData() : media.getStringData().getBytes(getCharset(media.getContentType()));
+		  else {
+			 InputStream is = media.getStreamData();
+			 ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			 byte[] buf = new byte[ 1000 ];
+			 int byteread = 0;
+			 
+				  while (( byteread=is.read(buf) )!=-1)
+					baos.write(buf,0,byteread);
+			
+			bytes = baos.toByteArray();
+		 }
 		} catch (IOException e) {
 			log.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			throw new IllegalStateException(e.getLocalizedMessage());
@@ -602,28 +674,34 @@ public class WAttachmentScanner extends Window implements EventListener<Event> {
 	}
 
 	/**
-	 * Delete entire Attachment
+	 *	Delete entire Attachment
 	 */
-	private void deleteAttachment() {
+	private void deleteAttachment()
+	{
 		log.info("");
 
 		FDialog.ask(m_WindowNo, this, "AttachmentDelete?", new Callback<Boolean>() {
-
+			
 			@Override
-			public void onCallback(Boolean result) {
-				if (result) {
-					m_attachment.delete(true);
-					m_attachment = null;
-				}
+			public void onCallback(Boolean result) 
+			{
+				if (result)
+				{
+					if (m_attachment != null) {
+						m_attachment.delete(true);
+						m_attachment = null;
+					}
+				}					
 			}
-		});
-	} // deleteAttachment
+		});			
+	}	//	deleteAttachment
 
 	/**
-	 * Delete Attachment Entry
+	 *	Delete Attachment Entry
 	 */
 
-	private void deleteAttachmentEntry() {
+	private void deleteAttachmentEntry()
+	{
 		log.info("");
 
 		final int index = cbContent.getSelectedIndex();
@@ -635,25 +713,28 @@ public class WAttachmentScanner extends Window implements EventListener<Event> {
 		FDialog.ask(m_WindowNo, this, "AttachmentDeleteEntry?", new Callback<Boolean>() {
 
 			@Override
-			public void onCallback(Boolean result) {
-				if (result) {
+			public void onCallback(Boolean result) 
+			{
+				if (result)
+				{
 					if (m_attachment.deleteEntry(index)) {
 						cbContent.removeItemAt(index);
 						clearPreview();
-						autoPreview(cbContent.getSelectedIndex(), true);
+						autoPreview (cbContent.getSelectedIndex(), true);
 					}
 
 					m_change = true;
-				}
+				}				
 			}
-		});
-	} // deleteAttachment
+		});		
+	}	//	deleteAttachment
 
 	/**
-	 * Save Attachment to File
+	 *	Save Attachment to File
 	 */
 
-	private void saveAttachmentToFile() {
+	private void saveAttachmentToFile()
+	{
 		int index = cbContent.getSelectedIndex();
 		log.info("index=" + index);
 
@@ -661,30 +742,48 @@ public class WAttachmentScanner extends Window implements EventListener<Event> {
 			return;
 
 		MAttachmentEntry entry = m_attachment.getEntry(index);
-		if (entry != null && entry.getData() != null) {
-			try {
+		if (entry != null && entry.getData() != null)
+		{
+			try
+			{
 				AMedia media = new AMedia(entry.getName(), null, entry.getContentType(), entry.getData());
 				Filedownload.save(media);
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				log.log(Level.SEVERE, "attachment", e);
 			}
 		}
-	} // saveAttachmentToFile
-
+	}	//	saveAttachmentToFile
+	
+	
 	static private String getCharset(String contentType) {
 		if (contentType != null) {
 			int j = contentType.indexOf("charset=");
 			if (j >= 0) {
 				String cs = contentType.substring(j + 8).trim();
-				if (cs.length() > 0)
-					return cs;
+				if (cs.length() > 0) return cs;
 			}
 		}
 		return "UTF-8";
-	}
+	}	
 
+	private void saveAllAsZip() {
+		File zipFile = m_attachment.saveAsZip();
+		
+		if (zipFile != null) {
+			String name = MTable.get(Env.getCtx(), m_attachment.getAD_Table_ID()).getTableName() + "_" + m_attachment.getRecord_ID();
+			AMedia media = null;	
+			try {
+				media = new AMedia(name, null, "application/zip", zipFile, true);
+			} catch (Exception e) {
+				throw new AdempiereException("Error when converting zip file to media : " + e);
+			}			
+			Filedownload.save(media);
+		}
+	}
+	
 	/**
-	 * @author Double Click Sistemas
 	 * @author Saul Piña spina@dcs.net.ve
 	 */
 	private void getImageFromScanner() {
@@ -693,7 +792,6 @@ public class WAttachmentScanner extends Window implements EventListener<Event> {
 	}
 	
 	/**
-	 * @author Double Click Sistemas
 	 * @author Saul Piña spina@dcs.net.ve
 	 */
 	public void loadImageFromScanner(byte[] image, String fileName) {
