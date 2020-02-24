@@ -28,9 +28,11 @@ cd attachscan-plugins
 Then install it in iDepiere.
 
 Toolbar:
+
 ![](screenshots/toolbar.png)
 
 Window:
+
 ![](screenshots/attachment.png)
 
 ## Extra Links
