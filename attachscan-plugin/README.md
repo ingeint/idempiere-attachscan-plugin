@@ -6,11 +6,7 @@
 
 ## Description
 
-Put the plugin description here
-
-## Contributors
-
-- Put the contributor list here, format: Year Name <name@email.com>.
+This plugin implement the interface 'sane' to scan directly from iDempiere.
 
 ## Components
 
@@ -23,18 +19,6 @@ Put the plugin description here
 - Java 11, commands `java` and `javac`.
 - iDempiere 7.1.0
 - Set `IDEMPIERE_REPOSITORY` env variable
-
-## Features/Documentation
-
-- Put the plugin feature list here
-
-## Instructions
-
-- Put the instructions list to install here
-
-## Extra Links
-
-- Put the documentation/links here
 
 ## Commands
 
