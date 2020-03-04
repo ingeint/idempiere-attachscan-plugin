@@ -135,14 +135,17 @@ public class ControllerScan implements ActionListener, WindowListener {
                 SaneOption resolution = device.getOption("resolution");
                 resolution.setIntegerValue(viewScan.getTxtResolution().getInteger());
 
-                if(viewScan.getCbDuplex().isSelected()) {
+                SaneOption mode = device.getOption("mode");
+                mode.setStringValue("Color");
+
+                if (viewScan.getCbDuplex().isSelected()) {
                     SaneOption scanMode = device.getOption("ScanMode");
                     scanMode.setStringValue("Duplex");
                 }
 
                 PDDocument document = new PDDocument();
 
-                while (true) {
+                do {
                     try {
                         BufferedImage image = device.acquireImage();
 
@@ -163,7 +166,7 @@ public class ControllerScan implements ActionListener, WindowListener {
                             throw e;
                         }
                     }
-                }
+                } while (viewScan.getCbDuplex().isSelected());
 
                 String fileName = System.currentTimeMillis() + ".pdf";
                 document.save(fileName);
