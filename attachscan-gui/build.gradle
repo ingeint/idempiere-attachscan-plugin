@@ -15,6 +15,10 @@ repositories {
 dependencies {
     compile group: 'com.googlecode.jfreesane', name: 'jfreesane', version: '0.98'
     compile group: 'com.miglayout', name: 'miglayout-swing', version: '5.2'
+    compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.19'
+    compile group: 'org.apache.pdfbox', name: 'pdfbox-app', version: '2.0.19'
+    compile group: 'org.apache.pdfbox', name: 'pdfbox-tools', version: '2.0.19'
+
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 

@@ -40,7 +40,7 @@ public class ASUILocale {
     }
 
     public static String[] list() {
-        return new String[]{"en", "es"};
+        return new String[]{"en"};
     }
 
 }

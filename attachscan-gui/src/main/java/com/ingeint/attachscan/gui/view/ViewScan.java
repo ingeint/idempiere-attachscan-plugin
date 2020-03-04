@@ -58,15 +58,14 @@ public class ViewScan extends JFrame {
     private JComboBox<SaneDeviceWrap> cmbDevice;
     private JButton btnScan;
     private DefaultComboBoxModel<SaneDeviceWrap> cmbDeviceModel;
-    private JMenuItem mniSave;
-    private JLabel lblImage;
     private JLabel lblPort;
     private JIntegerField txtPort;
     private JLabel lblResolution;
     private JIntegerField txtResolution;
+    private JCheckBox cbDuplex;
 
     public ViewScan() {
-        setSize(530, 600);
+        setSize(530, 200);
         setLocationRelativeTo(this);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setIconImage(ASUIStandard.ICON);
@@ -84,10 +83,8 @@ public class ViewScan extends JFrame {
         mnuBar.add(mnuOptions);
         mnuBar.add(mnuHelp);
 
-        mniSave = new JMenuItem();
         mnuLocale = new JMenu();
         mniClose = new JMenuItem();
-        mnuOptions.add(mniSave);
         mnuOptions.add(mnuLocale);
         mnuOptions.add(mniClose);
 
@@ -96,7 +93,6 @@ public class ViewScan extends JFrame {
         mnuHelp.add(mniDocumentation);
         mnuHelp.add(mniAbout);
 
-        menuItems.add(mniSave);
         menuItems.add(mniDocumentation);
         menuItems.add(mniAbout);
         menuItems.add(mniClose);
@@ -120,6 +116,8 @@ public class ViewScan extends JFrame {
         lblResolution = new JLabel();
         txtResolution = new JIntegerField();
 
+        cbDuplex = new JCheckBox();
+
         buttons.add(btnScan);
         buttons.add(btnSearch);
 
@@ -133,14 +131,8 @@ public class ViewScan extends JFrame {
         noPanel.add(btnScan, "growx, height 26, wrap");
         noPanel.add(lblResolution, "width 40, height 26");
         noPanel.add(txtResolution, "width 80, height 26");
+        noPanel.add(cbDuplex, "growx, height 26");
         add(noPanel, BorderLayout.NORTH);
-
-        // CENTER PANEL
-
-        lblImage = new JLabel();
-        JScrollPane scroll = new JScrollPane(lblImage);
-        add(scroll, BorderLayout.CENTER);
-
     }
 
     public void addListener(ControllerScan listener) {
@@ -203,20 +195,12 @@ public class ViewScan extends JFrame {
         return lblDevice;
     }
 
-    public JMenuItem getMniSave() {
-        return mniSave;
-    }
-
     public List<JButton> getButtons() {
         return buttons;
     }
 
     public List<JMenuItem> getMenuItems() {
         return menuItems;
-    }
-
-    public JLabel getLblImage() {
-        return lblImage;
     }
 
     public JLabel getLblPort() {
@@ -239,4 +223,7 @@ public class ViewScan extends JFrame {
         return txtResolution;
     }
 
+    public JCheckBox getCbDuplex() {
+        return cbDuplex;
+    }
 }

@@ -24,20 +24,21 @@
 
 package com.ingeint.attachscan.gui.controller;
 
-import au.com.southsky.jfreesane.SaneDevice;
-import au.com.southsky.jfreesane.SaneSession;
+import au.com.southsky.jfreesane.*;
 import com.ingeint.attachscan.gui.component.SaneDeviceWrap;
 import com.ingeint.attachscan.gui.feature.ASUIFeature;
 import com.ingeint.attachscan.gui.feature.ASUILocale;
-import com.ingeint.attachscan.gui.util.HelperDate;
-import com.ingeint.attachscan.gui.util.HelperFile;
-import com.ingeint.attachscan.gui.util.HelperImage;
 import com.ingeint.attachscan.gui.view.ViewAbout;
 import com.ingeint.attachscan.gui.view.ViewScan;
 import com.ingeint.attachscan.gui.view.ViewWait;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,7 +53,6 @@ import java.net.URI;
 public class ControllerScan implements ActionListener, WindowListener {
 
     private ViewScan viewScan;
-    private BufferedImage image;
     private ViewWait viewWait;
 
     public ControllerScan() {
@@ -90,18 +90,16 @@ public class ControllerScan implements ActionListener, WindowListener {
         viewScan.getBtnSearch().setText(ASUILocale.get("ViewScan.btnSearch"));
         viewScan.getLblDevice().setText(ASUILocale.get("ViewScan.lblDevice"));
         viewScan.getBtnScan().setText(ASUILocale.get("ViewScan.btnScan"));
-        viewScan.getMniSave().setText(ASUILocale.get("ViewScan.mniSave"));
         viewScan.getMniDocumentation().setText(ASUILocale.get("ViewScan.mniDocumentation"));
         viewScan.getLblPort().setText(ASUILocale.get("ViewScan.lblPort"));
         viewScan.getLblResolution().setText(ASUILocale.get("ViewScan.lblResolution"));
+        viewScan.getCbDuplex().setText(ASUILocale.get("ViewScan.duplex"));
     }
 
     @Override
     public void actionPerformed(ActionEvent ae) {
         if (ae.getSource().equals(viewScan.getMniClose()))
             close();
-        else if (ae.getSource().equals(viewScan.getMniSave()))
-            save();
         else if (ae.getSource().equals(viewScan.getMniAbout()))
             about();
         else if (ae.getSource().equals(viewScan.getMniDocumentation()))
@@ -134,9 +132,52 @@ public class ControllerScan implements ActionListener, WindowListener {
                 if (!device.isOpen()) {
                     device.open();
                 }
-                device.getOption("resolution").setIntegerValue(viewScan.getTxtResolution().getInteger());
-                image = device.acquireImage();
-                viewScan.getLblImage().setIcon(new ImageIcon(image));
+                SaneOption resolution = device.getOption("resolution");
+                resolution.setIntegerValue(viewScan.getTxtResolution().getInteger());
+
+                if(viewScan.getCbDuplex().isSelected()) {
+                    SaneOption scanMode = device.getOption("ScanMode");
+                    scanMode.setStringValue("Duplex");
+                }
+
+                PDDocument document = new PDDocument();
+
+                while (true) {
+                    try {
+                        BufferedImage image = device.acquireImage();
+
+                        float width = image.getWidth();
+                        float height = image.getHeight();
+
+                        PDPage page = new PDPage(new PDRectangle(width, height));
+                        document.addPage(page);
+
+                        PDImageXObject img = LosslessFactory.createFromImage(document, image);
+                        PDPageContentStream contentStream = new PDPageContentStream(document, page);
+                        contentStream.drawImage(img, 0, 0);
+                        contentStream.close();
+                    } catch (SaneException e) {
+                        if (e.getStatus() == SaneStatus.STATUS_NO_DOCS) {
+                            break;
+                        } else {
+                            throw e;
+                        }
+                    }
+                }
+
+                String fileName = System.currentTimeMillis() + ".pdf";
+                document.save(fileName);
+                document.close();
+                if (Desktop.isDesktopSupported()) {
+                    try {
+                        File myFile = new File(fileName);
+                        Desktop.getDesktop().open(myFile);
+                    } catch (IOException ex) {
+                        throw ex;
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(viewScan, ASUILocale.get("ViewScan.fileSavedIn") + " " + fileName, "Info", JOptionPane.ERROR_MESSAGE);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(viewScan, ASUILocale.get("ViewScan.errorDisplayImage"), "Error", JOptionPane.ERROR_MESSAGE);
@@ -169,8 +210,6 @@ public class ControllerScan implements ActionListener, WindowListener {
                     }
                 } catch (Exception e) {
                     viewScan.getCmbDeviceModel().removeAllElements();
-                    viewScan.getLblImage().setIcon(null);
-                    image = null;
                     JOptionPane.showMessageDialog(viewScan, ASUILocale.get("ViewScan.errorLoadDevice"), "Error", JOptionPane.ERROR_MESSAGE);
                     e.printStackTrace();
                 } finally {
@@ -195,30 +234,6 @@ public class ControllerScan implements ActionListener, WindowListener {
     public void about() {
         ViewAbout viewAbout = new ViewAbout();
         viewAbout.setVisible(true);
-    }
-
-    public void save() {
-        if (image == null) {
-            JOptionPane.showMessageDialog(viewScan, ASUILocale.get("ViewScan.noScan"), "Error", JOptionPane.ERROR_MESSAGE);
-        } else {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setMultiSelectionEnabled(false);
-            fileChooser.setAcceptAllFileFilterUsed(false);
-            fileChooser.setFileFilter(new FileNameExtensionFilter("jpg", "jpg"));
-            fileChooser.setFileFilter(new FileNameExtensionFilter("png", "png"));
-            fileChooser.setSelectedFile(new File(HelperDate.nowFormat("yyyyMMddHHmmss")));
-            fileChooser.showSaveDialog(viewScan);
-            if (fileChooser.getSelectedFile() != null) {
-                String path = fileChooser.getSelectedFile().getAbsolutePath();
-                path = HelperFile.isFileType(path, "jpg", "png") ? path : path + "." + fileChooser.getFileFilter().getDescription();
-                try {
-                    HelperImage.writeImage(image, path);
-                } catch (IOException e) {
-                    JOptionPane.showMessageDialog(viewScan, ASUILocale.get("ViewScan.noSave"), "Error", JOptionPane.ERROR_MESSAGE);
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     @Override
